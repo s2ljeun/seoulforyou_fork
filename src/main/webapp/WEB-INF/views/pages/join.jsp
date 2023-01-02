@@ -3,6 +3,7 @@
 <!DOCTYPE html>
 <head>
 	<link rel="stylesheet" href="resources/css/bootstrap.min.css">
+	<script src="resources/js/jquery-3.6.1.min.js"></script>
 	<script src="resources/js/bootstrap.bundle.min.js"></script>
 	<link rel="stylesheet" href="resources/js/bootstrap.min.js">
 	  <style>
@@ -36,7 +37,7 @@
 </head>
 
 <body>
-<form name="f" method="post" action="join.do">
+<form id="f" name="f" method="post" action="join.do">
   <div class="container">
     <div class="input-form-backgroud row">
       <div class="input-form col-md-12 mx-auto">
@@ -52,7 +53,8 @@
             <div class="row">
             <div class="col-md-6 mb-3">
               <label for="name">아이디</label>
-              <input type="text" class="form-control" name="member_id" id="member_id" placeholder=""  required="">
+              <input type="text" class="form-control" name="member_id" id="member_id" placeholder="" status=""  required="">
+              <button onclick="checkId()" class="btn btn-outline-secondary">ID 중복확인</button>
               <div class="invalid-feedback">
                 	아이디를 입력해주세요.
               </div>
@@ -85,7 +87,7 @@
           <hr class="mb-4">
  
           <div class="mb-4"></div>
-          <button class="btn btn-primary" type="submit">가입 완료</button>
+          <button class="btn btn-primary" onclick="submitForm()">가입 완료</button>
           <input class="btn btn-outline-secondary" type="button" style= "width:90px" value="취소" onclick="javascript:go_index()">    
       </div>
     </div>
@@ -99,5 +101,61 @@
 	<script>
 	function go_index(){
 		location.href="index.do";
+	}
+	</script>
+	
+	<script>
+	function submitForm(){
+		let status = $('#member_id').attr('status'); //아이디 중복체크 상태
+		
+		if(status == ""){
+			alert("아이디 중복체크를 해주세요.");
+			$('#member_id').focus();
+		}else if(status == "no"){
+			alert("다른 아이디를 입력해주세요.")
+			$('#member_id').focus();
+		}else{
+			$('#f').submit();
+		}
+	}
+	</script>
+	
+	<script>
+	function checkId(){
+		let status = $('#member_id').attr('status'); //아이디 중복체크 상태
+		let memberId = $('#member_id').val(); //입력한 아이디값
+		$('.checkIdSpan').remove(); //기존에 중복체크한 이력 지워주기
+		
+		//아이디를 입력하지 않았다면
+		if(memberId == ""){
+			$('#member_id').after("<span class='checkIdSpan' style='color:lightgray'>아이디를 입력해주세요.</span>");
+			$('#member_id').focus();
+			return
+		}
+		
+		$.ajax({
+			url: 'checkId.do',
+			type: 'POST',
+			async: true,
+			data: {
+				member_id: memberId
+			},
+			success: function(data){
+				//기존 아이디가 존재한다면
+				if(data.cnt > 0){
+					$('#member_id').attr('status', 'no');
+					$('#member_id').after("<span class='checkIdSpan' style='color:red'>이미 존재하는 아이디입니다.</span>")
+					$('#member_id').focus();
+					
+				//기존 아이디가 존재하지 않으면
+				}else{
+					$('#member_id').attr('status', 'yes');
+					$('#member_id').after("<span class='checkIdSpan' style='color:blue'>사용 가능한 아이디입니다.</span>")
+				}
+			},
+			error: function(e){
+				alert("error");
+			}
+		});
 	}
 	</script>

@@ -366,7 +366,7 @@ public class AdminController {
 		return "message";
 	}
 	@RequestMapping("/admin_delete.do")
-	public String adminDelete(HttpServletRequest req, @ModelAttribute AdminDTO dto) {
+	public String adminDelete(HttpServletRequest req, @ModelAttribute AdminDTO dto, BindingResult result) {
 		int res = adminMapper.adminDelete(dto);
 		
 		if(res>0) {

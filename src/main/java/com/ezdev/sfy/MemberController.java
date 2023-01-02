@@ -1,6 +1,7 @@
 package com.ezdev.sfy;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.Cookie;
@@ -111,6 +112,26 @@ public class MemberController {
 		 }
 		return "message";
 	}
+	
+	//회원가입 - 아이디 중복체크
+	@RequestMapping("checkId.do")
+	@ResponseBody
+	public Map<Object, Object> checkId(@RequestParam String member_id) {
+		MemberDTO dto = memberMapper.getMemberId(member_id);
+		Map<Object, Object> map = new HashMap<>();
+
+		// 아이디가 존재하지 않으면
+		if(dto == null) {
+			map.put("cnt", 0);
+		// 아이디가 존재하면
+		}else {
+			map.put("cnt", 1);
+		}
+		
+		return map;
+	}
+	
+	
 	//카카오 로그인
 		@RequestMapping(value="/kakaoLogin.do", method=RequestMethod.GET)
 		public String getInfo(HttpServletRequest req, @RequestParam String code) throws IOException {
